@@ -1,0 +1,14 @@
+{% extends "global/base.html" %}
+{% block servicos %}
+<section id="servicos" class="section bg-surface-section reveal">
+  <div class="container">
+    <h2 class="section-title">Nossos Serviços</h2>
+    <p class="section-sub">Soluções completas em metalurgia para sua embarcação, residência ou comércio.</p>
+    <div class="servicos-grid">
+    {% for oferta in ofertas %}
+      {% include "servico/partials/nossos-servicos.html" %}
+    {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock servicos %}

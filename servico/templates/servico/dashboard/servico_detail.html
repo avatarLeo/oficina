@@ -1,0 +1,132 @@
+{% extends "servico/dashboard/base_dashboard.html" %}
+{% block dash_content %}
+<div class="dash-header">
+    <a href="{% url 'dashboard_servicos' %}" class="back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+    <h1>Serviço #{{ servico.id }}</h1>
+    <div style="display:flex; gap:0.8rem; margin-top:0.8rem;">
+        <a href="{% url 'dashboard_editar_servico' servico.id %}" class="action-btn">
+            <i class="fas fa-pen"></i> Editar
+        </a>
+        <form method="post" action="{% url 'dashboard_excluir_servico' servico.id %}"
+              onsubmit="return confirm('Tem certeza que deseja excluir este serviço?')"
+              style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="action-btn" style="color:#ef4444; border-color:#ef4444;">
+                <i class="fas fa-trash"></i> Excluir
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="detail-grid">
+    <div class="detail-card detail-full">
+        <h3><i class="fas fa-align-left"></i> Descrição</h3>
+        <p>{{ servico.descricao|linebreaksbr }}</p>
+    </div>
+
+    <div class="detail-card">
+        <h3><i class="fas fa-user"></i> Cliente</h3>
+        <p><strong>{{ servico.cliente.nome }}</strong></p>
+        <p>CPF: {{ servico.cliente.cpf }}</p>
+        <p>Tel: {{ servico.cliente.telefone }}</p>
+        {% if servico.cliente.email %}
+            <p>Email: {{ servico.cliente.email }}</p>
+        {% endif %}
+    </div>
+
+    <div class="detail-card" id="status-card">
+        <h3><i class="fas fa-tag"></i> Status</h3>
+        <p class="status-badge status-{{ servico.status }}" style="font-size:1.6rem; display:inline-block; margin-bottom:1.5rem;">
+            {% if servico.status == 'aguardando' %}⏰ Aguardando
+            {% elif servico.status == 'em_andamento' %}🔧 Em andamento
+            {% elif servico.status == 'servico_concluido' %}✅ Concluído
+            {% endif %}
+        </p>
+
+        <form method="post" action="{% url 'dashboard_mudar_status' servico.id %}" class="status-form">
+            {% csrf_token %}
+            <select name="status" class="form-select">
+                <option value="">Mudar status...</option>
+                <option value="aguardando" {% if servico.status == 'aguardando' %}disabled{% endif %}>
+                    ⏰ Aguardando
+                </option>
+                <option value="em_andamento" {% if servico.status == 'em_andamento' %}disabled{% endif %}>
+                    🔧 Em andamento
+                </option>
+                <option value="servico_concluido" {% if servico.status == 'servico_concluido' %}disabled{% endif %}>
+                    ✅ Serviço concluído
+                </option>
+            </select>
+            <button type="submit" class="btn-submit-status">Atualizar</button>
+        </form>
+    </div>
+
+    <div class="detail-card">
+        <h3><i class="fas fa-calendar-check"></i> Previsão de Entrega</h3>
+        {% if servico.previsao_entrega %}
+            <p style="font-size:1.6rem; font-weight:700; {% if servico.previsao_entrega < today and servico.status != 'servico_concluido' %}color:#ef4444{% else %}color:var(--text){% endif %};">
+                {{ servico.previsao_entrega|date:"d/m/Y" }}
+                {% if servico.previsao_entrega < today and servico.status != 'servico_concluido' %}
+                    <span style="font-size:1rem; color:#ef4444; display:block;">⚠ Atrasado</span>
+                {% endif %}
+            </p>
+        {% else %}
+            <p style="color:var(--text-muted);">—</p>
+        {% endif %}
+        <form method="post" action="{% url 'dashboard_alterar_previsao' servico.id %}"
+              style="margin-top:1rem; display:flex; gap:0.8rem; flex-wrap:wrap;">
+            {% csrf_token %}
+            <input type="date" name="previsao_entrega" value="{{ servico.previsao_entrega|date:'Y-m-d' }}"
+                   style="flex:1; min-width:14rem; padding:0.8rem 1.2rem; border:1px solid var(--border); border-radius:6px; font-size:1.4rem;">
+            <button type="submit" class="btn-submit-obs">Alterar</button>
+        </form>
+    </div>
+
+    <div class="detail-card">
+        <h3><i class="fas fa-calendar-day"></i> Criado em</h3>
+        <p style="font-size:1.6rem; font-weight:700;">{{ servico.criado_em|date:"d/m/Y H:i" }}</p>
+        <p style="color:var(--text-muted);">({{ servico.criado_em|timesince }})</p>
+    </div>
+
+    {% include "servico/dashboard/partials/pagamento_card.html" %}
+
+    <div class="detail-card" id="observacoes-section">
+        <h3><i class="fas fa-comment"></i> Observações</h3>
+        {% include "servico/dashboard/partials/observacoes.html" %}
+
+        <form hx-post="{% url 'dashboard_adicionar_observacao' servico.id %}"
+              hx-target="#observacoes-box"
+              hx-swap="outerHTML"
+              class="obs-form">
+            {% csrf_token %}
+            <textarea name="observacao" class="form-textarea" placeholder="Adicionar observação..." rows="3"></textarea>
+            <button type="submit" class="btn-submit-obs">Adicionar</button>
+        </form>
+    </div>
+
+    {% if servico.historico.all %}
+    <div class="detail-card">
+        <h3><i class="fas fa-timeline"></i> Histórico</h3>
+        <ul class="history-list">
+        {% for h in servico.historico.all %}
+            <li>
+                <span class="history-date">{{ h.criado_em|date:"d/m/Y H:i" }}</span>
+                {% if h.status_anterior %}
+                    <span class="history-status status-{{ h.status_anterior }}">{{ h.status_anterior }}</span>
+                    <i class="fas fa-arrow-right"></i>
+                {% endif %}
+                <span class="history-status status-{{ h.status_novo }}">{{ h.status_novo }}</span>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if servico.imagem %}
+    <div class="detail-card">
+        <h3><i class="fas fa-image"></i> Imagem</h3>
+        <img src="{{ servico.imagem.url }}" alt="Imagem do serviço" style="max-width:100%; border-radius:8px;">
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

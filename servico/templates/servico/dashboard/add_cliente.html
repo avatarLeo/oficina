@@ -1,0 +1,84 @@
+{% extends "servico/dashboard/base_dashboard.html" %}
+{% block dash_content %}
+<div class="dash-header">
+    <a href="{% url 'dashboard_clientes' %}" class="back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
+    <h1>Novo Cliente</h1>
+</div>
+
+<form method="post" class="dash-form">
+    {% csrf_token %}
+    <div class="form-grid">
+        <div class="form-group">
+            <label class="form-label">Nome <span class="required">*</span></label>
+            <input type="text" name="nome" required class="form-control" placeholder="Nome do cliente">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Telefone <span class="required">*</span></label>
+            <input type="tel" name="telefone" id="telefone-input" required class="form-control" placeholder="(71) 99999-0000">
+        </div>
+        <div class="form-group">
+            <label class="form-label">CPF</label>
+            <input type="text" name="cpf" id="cpf-input" class="form-control" placeholder="000.000.000-00">
+            <span id="cpf-feedback" class="form-help" style="display:none;"></span>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" placeholder="cliente@email.com">
+        </div>
+    </div>
+    <div class="form-actions">
+        <a href="{% url 'dashboard_clientes' %}" class="btn-cancel">Cancelar</a>
+        <button type="submit" class="btn-submit-obs">Salvar Cliente</button>
+    </div>
+</form>
+<script>
+(function() {
+    function validarCPF(cpf) {
+        cpf = cpf.replace(/\D/g, '');
+        if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+        var calc = function(digitos, pesos) {
+            var soma = 0;
+            for (var i = 0; i < digitos.length; i++)
+                soma += parseInt(digitos[i]) * pesos[i];
+            var resto = soma % 11;
+            return resto < 2 ? 0 : 11 - resto;
+        };
+        var dig1 = calc(cpf.slice(0,9), [10,9,8,7,6,5,4,3,2]);
+        if (dig1 !== parseInt(cpf[9])) return false;
+        var dig2 = calc(cpf.slice(0,10), [11,10,9,8,7,6,5,4,3,2]);
+        return dig2 === parseInt(cpf[10]);
+    }
+
+    var cpfInput = document.getElementById('cpf-input');
+    var cpfFeedback = document.getElementById('cpf-feedback');
+    if (cpfInput && cpfFeedback) {
+        cpfInput.addEventListener('input', function() {
+            var v = this.value.replace(/\D/g, '').slice(0, 11);
+            if (v.length > 9) v = v.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+            else if (v.length > 6) v = v.replace(/^(\d{3})(\d{3})(\d{1,3})$/, '$1.$2.$3');
+            else if (v.length > 3) v = v.replace(/^(\d{3})(\d{1,3})$/, '$1.$2');
+            if (this.value !== v) this.value = v;
+
+            var val = this.value.replace(/\D/g, '');
+            if (val.length < 11) { cpfFeedback.style.display = 'none'; return; }
+            cpfFeedback.style.display = 'inline';
+            if (validarCPF(val)) {
+                cpfFeedback.innerHTML = '<span style="color:#27ae60;">\u2714 CPF v\u00e1lido</span>';
+            } else {
+                cpfFeedback.innerHTML = '<span style="color:#ef4444;">\u2718 CPF inv\u00e1lido</span>';
+            }
+        });
+    }
+
+    var telInput = document.getElementById('telefone-input');
+    if (telInput) {
+        telInput.addEventListener('input', function() {
+            var v = this.value.replace(/\D/g, '').slice(0, 11);
+            if (v.length > 6) v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+            else if (v.length > 2) v = v.replace(/^(\d{2})(\d{1,5})$/, '($1) $2');
+            if (this.value !== v) this.value = v;
+        });
+    }
+})();
+</script>
+{% endblock %}

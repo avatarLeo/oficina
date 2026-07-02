@@ -1,0 +1,47 @@
+<section id="contato" class="section bg-surface-section reveal">
+  <div class="container">
+    <h2 class="section-title">Fale Conosco</h2>
+    <p class="section-sub">Estamos prontos para atender você. Envie sua mensagem ou visite nossa oficina.</p>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>Visite nossa Oficina</h3>
+        <div class="contact-info-item">
+          <div class="ci-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <div class="ci-text">
+            <strong>Endereço</strong>
+            Rua da Rodagem, Cacha Pregos — Vera Cruz, BA
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="ci-icon"><i class="fas fa-phone-alt"></i></div>
+          <div class="ci-text">
+            <strong>Telefone / WhatsApp</strong>
+            (71) 99999-0000
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="ci-icon"><i class="fas fa-clock"></i></div>
+          <div class="ci-text">
+            <strong>Horário de Funcionamento</strong>
+            Seg a Sex, das 07:30 às 17:00
+          </div>
+        </div>
+        <div class="map-container">
+          <iframe
+            src="https://maps.google.com/maps?q=Vera+Cruz+BA+Rua+da+Rodagem+Cacha+Pregos&output=embed"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+      </div>
+      <form id="contactForm" class="contact-form" method="post">
+        {% csrf_token %}
+        <input type="text" name="nome" placeholder="Seu Nome" required>
+        <input type="tel" name="telefone" placeholder="Seu Telefone / WhatsApp" required>
+        <textarea name="mensagem" placeholder="Descreva o serviço que você precisa..." rows="5" required></textarea>
+        <button type="submit" class="btn">Enviar Mensagem</button>
+      </form>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,76 @@
+{% extends "servico/dashboard/base_dashboard.html" %}
+{% block dash_content %}
+<div class="dash-header">
+    <h1>Dashboard</h1>
+    <p>Visão geral dos serviços</p>
+</div>
+
+<div class="stats-grid">
+    <a href="{% url 'dashboard_servicos' %}" class="stat-card stat-total">
+        <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+        <div class="stat-info">
+            <span class="stat-number">{{ total }}</span>
+            <span class="stat-label">Total</span>
+        </div>
+    </a>
+    <a href="{% url 'dashboard_servicos' %}?status=aguardando" class="stat-card stat-waiting">
+        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+        <div class="stat-info">
+            <span class="stat-number">{{ aguardando }}</span>
+            <span class="stat-label">Aguardando</span>
+        </div>
+    </a>
+    <a href="{% url 'dashboard_servicos' %}?status=em_andamento" class="stat-card stat-progress">
+        <div class="stat-icon"><i class="fas fa-gear"></i></div>
+        <div class="stat-info">
+            <span class="stat-number">{{ andamento }}</span>
+            <span class="stat-label">Em andamento</span>
+        </div>
+    </a>
+    <a href="{% url 'dashboard_servicos' %}?status=servico_concluido" class="stat-card stat-done">
+        <div class="stat-icon"><i class="fas fa-circle-check"></i></div>
+        <div class="stat-info">
+            <span class="stat-number">{{ concluidos }}</span>
+            <span class="stat-label">Concluídos</span>
+        </div>
+    </a>
+    <a href="{% url 'dashboard_servicos' %}?nao_pago=1" class="stat-card stat-unpaid">
+        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-info">
+            <span class="stat-number">{{ nao_pagos }}</span>
+            <span class="stat-label">Não pagos</span>
+        </div>
+    </a>
+    <a href="{% url 'dashboard_servicos' %}?atrasado=1" class="stat-card {% if atrasados %}stat-overdue{% else %}stat-done{% endif %}">
+        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-info">
+            <span class="stat-number">{{ atrasados }}</span>
+            <span class="stat-label">Atrasados</span>
+        </div>
+    </a>
+</div>
+
+<div class="dash-section">
+    <h2>Ações rápidas</h2>
+    <div class="quick-actions">
+        <a href="{% url 'dashboard_servicos' %}?status=aguardando" class="action-btn">
+            <i class="fas fa-clock"></i> Ver serviços aguardando
+        </a>
+        <a href="{% url 'dashboard_servicos' %}?status=em_andamento" class="action-btn">
+            <i class="fas fa-gear"></i> Ver em andamento
+        </a>
+        <a href="{% url 'dashboard_servicos' %}" class="action-btn">
+            <i class="fas fa-list"></i> Todos os serviços
+        </a>
+        <a href="{% url 'dashboard_add_servico' %}" class="action-btn">
+            <i class="fas fa-plus"></i> Novo serviço
+        </a>
+        <a href="{% url 'dashboard_clientes' %}" class="action-btn">
+            <i class="fas fa-users"></i> Ver clientes
+        </a>
+        <a href="{% url 'dashboard_add_cliente' %}" class="action-btn">
+            <i class="fas fa-user-plus"></i> Novo cliente
+        </a>
+    </div>
+</div>
+{% endblock %}

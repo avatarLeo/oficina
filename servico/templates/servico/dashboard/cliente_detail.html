@@ -1,0 +1,144 @@
+{% extends "servico/dashboard/base_dashboard.html" %}
+{% block dash_content %}
+<div class="dash-header">
+    <a href="{% url 'dashboard_clientes' %}" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para Clientes</a>
+    <h1>{{ cliente.nome }}</h1>
+    <div style="display:flex; gap:0.8rem; margin-top:0.8rem;">
+        <a href="{% url 'dashboard_editar_cliente' cliente.id %}" class="action-btn">
+            <i class="fas fa-pen"></i> Editar
+        </a>
+        <form method="post" action="{% url 'dashboard_excluir_cliente' cliente.id %}"
+              onsubmit="return confirm('Tem certeza que deseja excluir {{ cliente.nome }}?{% if total %} Ele(a) possui {{ total }} serviço(s) que também serão removidos.{% endif %}')"
+              style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="action-btn" style="color:#ef4444; border-color:#ef4444;">
+                <i class="fas fa-trash"></i> Excluir
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card stat-total">
+        <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+        <div class="stat-info">
+            <span class="stat-number">{{ total }}</span>
+            <span class="stat-label">Serviços</span>
+        </div>
+    </div>
+    <div class="stat-card stat-progress">
+        <div class="stat-icon"><i class="fas fa-gear"></i></div>
+        <div class="stat-info">
+            <span class="stat-number">{{ andamento }}</span>
+            <span class="stat-label">Em andamento</span>
+        </div>
+    </div>
+    <div class="stat-card stat-done">
+        <div class="stat-icon"><i class="fas fa-circle-check"></i></div>
+        <div class="stat-info">
+            <span class="stat-number">{{ concluidos }}</span>
+            <span class="stat-label">Concluídos</span>
+        </div>
+    </div>
+    <div class="stat-card {% if atrasados %}stat-overdue{% else %}stat-done{% endif %}">
+        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-info">
+            <span class="stat-number">{{ atrasados }}</span>
+            <span class="stat-label">Atrasados</span>
+        </div>
+    </div>
+</div>
+
+<div class="detail-grid">
+    <div class="detail-card">
+        <h3><i class="fas fa-address-card"></i> Dados do Cliente</h3>
+        <table style="width:100%; border-collapse:collapse;">
+            <tr>
+                <td style="padding:0.6rem 0.8rem 0.6rem 0; font-weight:600; color:var(--text-muted); white-space:nowrap; vertical-align:top;">Nome</td>
+                <td style="padding:0.6rem 0;">{{ cliente.nome }}</td>
+            </tr>
+            <tr>
+                <td style="padding:0.6rem 0.8rem 0.6rem 0; font-weight:600; color:var(--text-muted); white-space:nowrap; vertical-align:top;">CPF</td>
+                <td style="padding:0.6rem 0;">{{ cliente.cpf|default:'—' }}</td>
+            </tr>
+            <tr>
+                <td style="padding:0.6rem 0.8rem 0.6rem 0; font-weight:600; color:var(--text-muted); white-space:nowrap; vertical-align:top;">Telefone</td>
+                <td style="padding:0.6rem 0;">{{ cliente.telefone }}</td>
+            </tr>
+            <tr>
+                <td style="padding:0.6rem 0.8rem 0.6rem 0; font-weight:600; color:var(--text-muted); white-space:nowrap; vertical-align:top;">Email</td>
+                <td style="padding:0.6rem 0;">{{ cliente.email|default:'—' }}</td>
+            </tr>
+            <tr>
+                <td style="padding:0.6rem 0.8rem 0.6rem 0; font-weight:600; color:var(--text-muted); white-space:nowrap; vertical-align:top;">Cadastrado em</td>
+                <td style="padding:0.6rem 0;">{{ cliente.criado_em|date:"d/m/Y H:i" }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="dash-section">
+    <h2>Serviços</h2>
+
+    <div class="table-container">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Descrição</th>
+                    <th>Status</th>
+                    <th>Previsão</th>
+                    <th>Valor</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in servicos %}
+                <tr>
+                    <td>{{ s.id }}</td>
+                    <td><strong>{{ s.descricao|truncatechars:60 }}</strong></td>
+                    <td>
+                        <span class="status-badge status-{{ s.status }}">
+                            {% if s.status == 'aguardando' %}⏰ Aguardando
+                            {% elif s.status == 'em_andamento' %}🔧 Em andamento
+                            {% elif s.status == 'servico_concluido' %}✅ Concluído
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if s.previsao_entrega %}
+                            <span{% if s.previsao_entrega < today and s.status != 'servico_concluido' %} style="color:#ef4444; font-weight:700;"{% endif %}>
+                                {{ s.previsao_entrega|date:"d/m/Y" }}
+                            </span>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if s.preco %}
+                            R$ {{ s.preco|floatformat:2 }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:0.4rem;">
+                            <a href="{% url 'dashboard_servico_detail' s.id %}" class="table-btn" title="Detalhes">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'dashboard_editar_servico' s.id %}" class="table-btn" title="Editar">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="empty-row">Nenhum serviço encontrado para este cliente.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

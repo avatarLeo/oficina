@@ -1,0 +1,62 @@
+{% extends "servico/dashboard/base_dashboard.html" %}
+{% block dash_content %}
+<div class="dash-header">
+    <h1>Clientes</h1>
+    <p>{{ clientes|length }} cliente{{ clientes|length|pluralize:'s' }} cadastrado{{ clientes|length|pluralize:'s' }}</p>
+</div>
+
+<div class="dash-toolbar">
+    <form method="get" action="{% url 'dashboard_clientes' %}" class="search-form">
+        <input type="text" name="q" placeholder="Buscar por nome, CPF ou telefone…" value="{{ q }}" class="search-input">
+        <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+    </form>
+    <a href="{% url 'dashboard_add_cliente' %}" class="btn-primary">
+        <i class="fas fa-plus"></i> Novo Cliente
+    </a>
+</div>
+
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Serviços</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in clientes %}
+            <tr>
+                <td><a href="{% url 'dashboard_cliente_detail' c.id %}" class="cliente-link"><strong>{{ c.nome }}</strong></a></td>
+                <td>{{ c.telefone }}</td>
+                <td>
+                    <span class="badge">{{ c.num_servicos }}</span>
+                </td>
+                <td>
+                    <div style="display:flex; gap:0.4rem;">
+                        <a href="{% url 'dashboard_editar_cliente' c.id %}" class="table-btn" title="Editar">
+                            <i class="fas fa-pen"></i>
+                        </a>
+                        <form method="post" action="{% url 'dashboard_excluir_cliente' c.id %}"
+                              onsubmit="return confirm('Tem certeza que deseja excluir {{ c.nome }}?{% if c.num_servicos %} Ele(a) possui {{ c.num_servicos }} serviço(s) que também serão removidos.{% endif %}')"
+                              style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="table-btn table-btn-danger" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="empty-row">
+                    {% if q %}Nenhum cliente encontrado para "{{ q }}"{% else %}Nenhum cliente cadastrado ainda.{% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

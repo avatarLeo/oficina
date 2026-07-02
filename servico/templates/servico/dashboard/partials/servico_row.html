@@ -1,0 +1,46 @@
+<tr id="servico-{{ servico.id }}">
+    <td>{{ servico.cliente.nome }}<br><small>{{ servico.cliente.cpf }}</small></td>
+    <td>
+        <span class="status-badge status-{{ servico.status }}">
+            {% if servico.status == 'aguardando' %}⏰ Aguardando
+            {% elif servico.status == 'em_andamento' %}🔧 Em andamento
+            {% elif servico.status == 'servico_concluido' %}✅ Concluído
+            {% endif %}
+        </span>
+    </td>
+    <td>
+        {% if servico.previsao_entrega %}
+            <span class="{% if servico.previsao_entrega < today and servico.status != 'servico_concluido' %}atrasado{% endif %}">
+                {{ servico.previsao_entrega|date:"d/m/Y" }}
+            </span>
+        {% else %}
+            <span class="text-muted">—</span>
+        {% endif %}
+    </td>
+    <td>
+        <span class="status-badge pagamento-{{ servico.status_pagamento }}">
+            {% if servico.status_pagamento == 'pendente' %}⬜ Pendente
+            {% elif servico.status_pagamento == 'parcial' %}💛 Parcial
+            {% elif servico.status_pagamento == 'pago' %}✅ Pago
+            {% endif %}
+        </span>
+    </td>
+    <td>
+        <div style="display:flex; gap:0.4rem;">
+            <a href="{% url 'dashboard_servico_detail' servico.id %}" class="table-btn" title="Detalhes">
+                <i class="fas fa-eye"></i>
+            </a>
+            <a href="{% url 'dashboard_editar_servico' servico.id %}" class="table-btn" title="Editar">
+                <i class="fas fa-pen"></i>
+            </a>
+            <form method="post" action="{% url 'dashboard_excluir_servico' servico.id %}"
+                  onsubmit="return confirm('Tem certeza que deseja excluir este serviço?')"
+                  style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="table-btn table-btn-danger" title="Excluir">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        </div>
+    </td>
+</tr>

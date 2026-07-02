@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% include "servico/partials/head.html" %}
+</head>
+<body>
+    {% include "servico/partials/header.html" %}
+    <main>{% block content %}{% endblock content %}</main>
+    {% include "servico/partials/footer.html" %}
+    {% include "servico/partials/whatsapp_button.html" %}
+</body>
+</html>

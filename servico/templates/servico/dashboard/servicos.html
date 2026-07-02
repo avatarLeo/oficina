@@ -1,0 +1,45 @@
+{% extends "servico/dashboard/base_dashboard.html" %}
+{% block dash_content %}
+<div class="dash-header">
+    <h1>Serviços</h1>
+    <p>Gerencie todos os serviços</p>
+</div>
+
+<div class="filter-bar">
+    <a href="{% url 'dashboard_servicos' %}"
+       class="filter-btn {% if not status_atual %}active{% endif %}">Todos</a>
+    <a href="{% url 'dashboard_servicos' %}?status=aguardando"
+       class="filter-btn {% if status_atual == 'aguardando' %}active{% endif %}">
+        <i class="fas fa-clock"></i> Aguardando
+    </a>
+    <a href="{% url 'dashboard_servicos' %}?status=em_andamento"
+       class="filter-btn {% if status_atual == 'em_andamento' %}active{% endif %}">
+        <i class="fas fa-gear"></i> Em andamento
+    </a>
+    <a href="{% url 'dashboard_servicos' %}?status=servico_concluido"
+       class="filter-btn {% if status_atual == 'servico_concluido' %}active{% endif %}">
+        <i class="fas fa-circle-check"></i> Concluídos
+    </a>
+</div>
+
+<div class="table-container" id="servico-table">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Status</th>
+                <th>Previsão</th>
+                <th>Pagamento</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servico in servicos %}
+                {% include "servico/dashboard/partials/servico_row.html" %}
+            {% empty %}
+                <tr><td colspan="5" class="empty-state">Nenhum serviço encontrado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

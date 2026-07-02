@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Metalúrgica Itaparica</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
+    {% load static %}
+    <script src="{% static 'servico/js/htmx.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'servico/css/dashboard.css' %}">
+</head>
+<body>
+    <div class="dash-wrapper">
+        <aside class="dash-sidebar">
+            <div class="sidebar-logo">⚓ Metalúrgica<br><span>Dashboard</span></div>
+            <nav class="sidebar-nav">
+                <a href="{% url 'dashboard_home' %}"
+                   class="sidebar-link {% if request.resolver_match.url_name == 'dashboard_home' %}active{% endif %}">
+                    <i class="fas fa-chart-simple"></i> Início
+                </a>
+                <a href="{% url 'dashboard_servicos' %}"
+                   class="sidebar-link {% if request.resolver_match.url_name == 'dashboard_servicos' %}active{% endif %}">
+                    <i class="fas fa-wrench"></i> Serviços
+                </a>
+                <a href="{% url 'dashboard_add_servico' %}"
+                   class="sidebar-link {% if request.resolver_match.url_name == 'dashboard_add_servico' %}active{% endif %}">
+                    <i class="fas fa-plus"></i> Novo Serviço
+                </a>
+                <a href="{% url 'dashboard_clientes' %}"
+                   class="sidebar-link {% if request.resolver_match.url_name == 'dashboard_clientes' or request.resolver_match.url_name == 'dashboard_cliente_detail' or request.resolver_match.url_name == 'dashboard_editar_cliente' %}active{% endif %}">
+                    <i class="fas fa-users"></i> Clientes
+                </a>
+                <a href="{% url 'dashboard_add_cliente' %}"
+                   class="sidebar-link {% if request.resolver_match.url_name == 'dashboard_add_cliente' %}active{% endif %}">
+                    <i class="fas fa-user-plus"></i> Novo Cliente
+                </a>
+                <a href="/admin/" class="sidebar-link" target="_blank">
+                    <i class="fas fa-database"></i> Admin
+                </a>
+                <a href="/" class="sidebar-link">
+                    <i class="fas fa-globe"></i> Site
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span>{{ request.user.get_short_name|default:request.user.username }}</span>
+                <form method="post" action="{% url 'admin:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="sidebar-logout"><i class="fas fa-right-from-bracket"></i> Sair</button>
+                </form>
+            </div>
+        </aside>
+        <main class="dash-main" id="dash-main">
+            {% block dash_content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

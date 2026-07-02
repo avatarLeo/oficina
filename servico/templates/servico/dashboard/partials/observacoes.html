@@ -1,0 +1,7 @@
+<div id="observacoes-box">
+    {% if servico.observacoes %}
+        <pre style="white-space:pre-wrap; font-family:inherit;">{{ servico.observacoes }}</pre>
+    {% else %}
+        <p class="empty-state">Nenhuma observação.</p>
+    {% endif %}
+</div>

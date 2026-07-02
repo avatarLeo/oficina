@@ -1,0 +1,40 @@
+<div id="pagamento-card" class="detail-card">
+    <h3><i class="fas fa-dollar-sign"></i> Pagamento</h3>
+
+    <p>
+        <span class="status-badge pagamento-{{ servico.status_pagamento }}" style="font-size:1.6rem;">
+            {% if servico.status_pagamento == 'pendente' %}⬜ Pendente
+            {% elif servico.status_pagamento == 'parcial' %}💛 Parcial
+            {% elif servico.status_pagamento == 'pago' %}✅ Pago
+            {% endif %}
+        </span>
+    </p>
+
+    <div style="margin-top:1rem;">
+        <p><strong>Valor total:</strong>
+            {% if servico.preco %}R$ {{ servico.preco|floatformat:2 }}{% else %}—{% endif %}
+        </p>
+        <p><strong>Valor pago:</strong> R$ {{ servico.valor_pago|floatformat:2 }}</p>
+        <p><strong>Restante:</strong>
+            {% if servico.restante is not None %}
+                R$ {{ servico.restante|floatformat:2 }}
+            {% else %}
+                —
+            {% endif %}
+        </p>
+    </div>
+
+    {% if servico.status_pagamento != 'pago' %}
+    <form hx-post="{% url 'dashboard_registrar_pagamento' servico.id %}"
+          hx-target="#pagamento-card"
+          hx-swap="outerHTML"
+          style="margin-top:1.5rem; display:flex; gap:0.8rem; flex-wrap:wrap;">
+        {% csrf_token %}
+        <input type="number" name="valor" step="0.01" min="0.01"
+               placeholder="Valor do pagamento"
+               required
+               style="flex:1; min-width:14rem; padding:0.8rem 1.2rem; border:1px solid var(--border); border-radius:6px; font-size:1.4rem;">
+        <button type="submit" class="btn-submit-obs">Registrar</button>
+    </form>
+    {% endif %}
+</div>
